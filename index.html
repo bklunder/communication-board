@@ -100,11 +100,13 @@
         .fun-plane {
             position: fixed;
             top: 8%;
-            left: -150px;
-            font-size: 45px;
+            left: -20vw;
+            width: 16.66vw; /* 1/6th of the screen width */
+            object-fit: contain; /* Prevents the image from stretching */
             z-index: -2; /* Stays far behind everything */
             pointer-events: none; /* Stops it from blocking taps */
             user-select: none;
+            -webkit-user-drag: none;
             animation: flyPlane 35s linear infinite;
         }
 
@@ -121,8 +123,8 @@
         }
 
         @keyframes flyPlane {
-            0% { left: -150px; transform: translateY(0); }
-            15% { left: 110vw; transform: translateY(-30px); } /* Slight upward tilt as it flies */
+            0% { left: -20vw; transform: translateY(0); }
+            15% { left: 110vw; transform: translateY(-30vw); } /* Slight upward tilt as it flies */
             100% { left: 110vw; } 
         }
 
@@ -138,7 +140,7 @@
 <body ontouchstart="" oncontextmenu="return false;">
 
     <!-- Fun Background Animations -->
-    <div class="fun-plane">✈️</div>
+    <img src="images/plane.png" class="fun-plane" alt="Flying Plane">
     <div class="fun-train">🚂🚋🚋</div>
 
     <h1>Nolan's Communication Board</h1>
