@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Communication Board</title>
+    <title>Nolan's Communication Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,12 +45,17 @@
             justify-content: center;
             aspect-ratio: 1 / 1; /* Keeps the cards perfectly square */
             border: 4px solid transparent;
+            /* Make the tap effect smooth and remove default grey iPad tap highlight */
+            transition: transform 0.1s, background-color 0.1s, box-shadow 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Makes the card 'squish' a little when pressed so he knows it worked */
+        /* Makes the card 'squish' and change color when pressed so he knows it worked */
         .card:active {
-            transform: scale(0.95);
+            transform: scale(0.90); /* Squishes down more now */
             border-color: #4CAF50; /* Green border when tapped */
+            background-color: #e8f5e9; /* Turns a light green color */
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1); /* Shadow goes 'inside' to look pressed */
         }
 
         .emoji {
@@ -80,9 +85,10 @@
         }
     </style>
 </head>
-<body>
+<!-- Adding ontouchstart allows iPads to instantly recognize the 'squish' tap animation -->
+<body ontouchstart="">
 
-    <h1>My Communication Board</h1>
+    <h1>Nolan's Communication Board</h1>
 
     <div class="board">
         <!-- Core Words -->
