@@ -8,7 +8,10 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f0f8ff; 
+            /* Beautiful Autumn Gradient Background */
+            background: linear-gradient(to bottom, #ffebd2, #ffb38a); 
+            min-height: 100vh; /* Ensures the background covers the whole screen */
+            overflow-x: hidden; /* Stops the screen from moving sideways */
             margin: 0;
             padding: 20px;
             /* Prevent text selection when tapping quickly */
@@ -54,6 +57,27 @@
         .emoji {
             font-size: 58px; /* Increased size by about 15% */
             margin-bottom: 10px;
+        }
+
+        /* --- Autumn Leaves Animation Styles --- */
+        .leaf {
+            position: fixed;
+            top: -10%;
+            z-index: -1; /* Keeps leaves floating BEHIND the buttons so they don't block taps */
+            user-select: none;
+            pointer-events: none; /* Ensures taps go straight through the leaves to the buttons */
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(100px, 110vh) rotate(360deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -143,6 +167,32 @@
             
             window.speechSynthesis.speak(utterance);
         }
+
+        // --- Autumn Leaves Animation Logic ---
+        function createLeaves() {
+            const leaves = ['🍂', '🍁', '🍃'];
+            const container = document.body;
+            
+            // Create 25 leaves
+            for (let i = 0; i < 25; i++) {
+                let leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                
+                // Pick a random leaf emoji
+                leaf.innerText = leaves[Math.floor(Math.random() * leaves.length)];
+                
+                // Randomize position, speed, and size
+                leaf.style.left = Math.random() * 100 + 'vw';
+                leaf.style.animationDuration = Math.random() * 5 + 6 + 's'; // Falling speed (6 to 11 seconds)
+                leaf.style.animationDelay = Math.random() * 5 + 's'; // Stagger the start times
+                leaf.style.fontSize = Math.random() * 15 + 20 + 'px'; // Random size
+                
+                container.appendChild(leaf);
+            }
+        }
+        
+        // Start the leaves falling when the page loads
+        window.addEventListener('load', createLeaves);
     </script>
 
 </body>
