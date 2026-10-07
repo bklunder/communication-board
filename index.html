@@ -145,6 +145,14 @@
 
     <div class="board">
         <!-- Core Words -->
+        <div class="card" onmousedown="speak('Yes')" ontouchstart="speak('Yes')">
+            <div class="emoji">✅</div>
+            Yes
+        </div>
+        <div class="card" onmousedown="speak('No')" ontouchstart="speak('No')">
+            <div class="emoji">❌</div>
+            No
+        </div>
         <div class="card" onmousedown="speak('Help')" ontouchstart="speak('Help')">
             <div class="emoji">🤝</div>
             Help
@@ -194,7 +202,7 @@
             Park
         </div>
         <div class="card" onmousedown="speak('I want to go on the swing')" ontouchstart="speak('I want to go on the swing')">
-            <div class="emoji">🎠</div>
+            <img src="images/swing.jpg" alt="Swing" class="card-img">
             Swing
         </div>
     </div>
