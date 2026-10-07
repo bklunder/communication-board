@@ -99,15 +99,15 @@
         /* --- Fun Background Animations --- */
         .fun-plane {
             position: fixed;
-            top: 8%;
-            left: -20vw;
             width: 16.66vw; /* 1/6th of the screen width */
             object-fit: contain; /* Prevents the image from stretching */
             z-index: -2; /* Stays far behind everything */
             pointer-events: none; /* Stops it from blocking taps */
             user-select: none;
             -webkit-user-drag: none;
-            animation: flyPlane 35s linear infinite;
+            mix-blend-mode: multiply; /* MAGICAL TRICK: Makes white backgrounds completely transparent! */
+            opacity: 0; /* Hidden by default until JS triggers it */
+            transition: opacity 1s;
         }
 
         .fun-train {
@@ -120,12 +120,6 @@
             user-select: none;
             animation: driveTrain 45s linear infinite;
             animation-delay: 15s; /* Delays the train so they don't always appear at the same time */
-        }
-
-        @keyframes flyPlane {
-            0% { left: -20vw; transform: translateY(0); }
-            15% { left: 110vw; transform: translateY(-30vw); } /* Slight upward tilt as it flies */
-            100% { left: 110vw; } 
         }
 
         @keyframes driveTrain {
@@ -155,7 +149,7 @@
             <div class="emoji">❌</div>
             No
         </div>
-        <div class="card" onmousedown="speak('Help')" ontouchstart="speak('Help')">
+        <div class="card" onmousedown="speak('Help please')" ontouchstart="speak('Help please')">
             <div class="emoji">🤝</div>
             Help
         </div>
@@ -255,16 +249,23 @@
             }
         });
 
-        // --- Unlock iOS Audio ---
+        // --- Unlock iOS Audio & Prevent Sleep Bug ---
         // Apple requires audio to be "primed" by a user interaction before it works freely.
+        // Furthermore, Safari's speech engine goes to sleep if not used for a few minutes.
         let isAudioUnlocked = false;
         function unlockAudio() {
             if (!isAudioUnlocked) {
-                // Play a silent, empty phrase to unlock the speech engine permanently for this session
                 let silent = new SpeechSynthesisUtterance('');
                 silent.volume = 0; // Completely silent
                 window.speechSynthesis.speak(silent);
                 isAudioUnlocked = true;
+
+                // Keep the audio engine awake by sending a silent pulse every 15 seconds!
+                setInterval(() => {
+                    let keepAlive = new SpeechSynthesisUtterance('');
+                    keepAlive.volume = 0;
+                    window.speechSynthesis.speak(keepAlive);
+                }, 15000);
             }
         }
         // Prime the audio on the very first touch anywhere on the screen
@@ -275,32 +276,23 @@
             // Prevent double-firing from touch and mouse events (Safari triggers both about 300ms apart)
             if (Date.now() - lastSpeakTime < 500) return;
             lastSpeakTime = Date.now();
-
-            // iOS BUG FIX: Only cancel if it's CURRENTLY speaking. 
-            // If you cancel an idle speech engine on an iPad, it permanently breaks the very next speech request!
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
+            
+            // We removed the cancel() and delay here, as they often cause the Apple speech engine to crash on the first tap.
+            let utterance = new SpeechSynthesisUtterance(text);
+            
+            // Look for a higher quality built-in voice
+            if (availableVoices.length > 0) {
+                let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
+                             || availableVoices.find(voice => voice.lang === 'en-US');
+                
+                if (bestVoice) {
+                    utterance.voice = bestVoice;
+                }
             }
             
-            // iOS BUG FIX: Wrap the actual speech in a tiny 50-millisecond delay.
-            // This gives the iPad's audio engine a fraction of a second to "clear its throat" after a touch or cancel.
-            setTimeout(() => {
-                let utterance = new SpeechSynthesisUtterance(text);
-                
-                // Look for a higher quality built-in voice
-                if (availableVoices.length > 0) {
-                    let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
-                                 || availableVoices.find(voice => voice.lang === 'en-US');
-                    
-                    if (bestVoice) {
-                        utterance.voice = bestVoice;
-                    }
-                }
-                
-                utterance.rate = 0.9; // Slightly slower for clarity
-                
-                window.speechSynthesis.speak(utterance);
-            }, 50);
+            utterance.rate = 0.9; // Slightly slower for clarity
+            
+            window.speechSynthesis.speak(utterance);
         }
 
         // --- Seasonal Theme & Animation Logic ---
@@ -350,6 +342,46 @@
         
         // Run the theme checker when the page loads
         window.addEventListener('load', setSeasonalTheme);
+
+        // --- Random Flying Plane Logic ---
+        function launchPlane() {
+            const plane = document.querySelector('.fun-plane');
+            
+            // Randomize starting and ending heights (between 5% and 40% from the top)
+            const startY = Math.random() * 35 + 5; 
+            const endY = startY - (Math.random() * 15 + 5); // Tends to fly slightly upwards
+            
+            // Randomize the flight speed (between 8 and 15 seconds to cross the screen)
+            const flightTime = Math.random() * 7 + 8;
+
+            // Reset the plane to the left side, hidden
+            plane.style.transition = 'none';
+            plane.style.opacity = '1';
+            plane.style.left = '-20vw';
+            plane.style.top = startY + 'vh';
+
+            // Wait a tiny bit for the CSS to reset, then trigger the animation
+            setTimeout(() => {
+                plane.style.transition = `left ${flightTime}s linear, top ${flightTime}s linear`;
+                plane.style.left = '110vw'; // Fly all the way across
+                plane.style.top = endY + 'vh'; // Arrive at the new height
+                
+                // Hide it when it finishes
+                setTimeout(() => {
+                    plane.style.opacity = '0';
+                }, flightTime * 1000);
+            }, 50);
+
+            // Schedule the next flight randomly between 20 and 45 seconds from now
+            const nextFlightDelay = Math.random() * 25000 + 20000;
+            setTimeout(launchPlane, nextFlightDelay);
+        }
+
+        // Start the random plane flights shortly after loading
+        window.addEventListener('load', () => {
+            setTimeout(launchPlane, 5000); // First flight happens 5 seconds after app opens!
+        });
+
     </script>
 
 </body>
