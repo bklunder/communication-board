@@ -65,6 +65,17 @@
             margin-bottom: 10px;
         }
 
+        /* Styling for real picture files */
+        .card-img {
+            width: 75px; 
+            height: 75px;
+            object-fit: contain; /* Keeps the picture from stretching */
+            margin-bottom: 10px;
+            pointer-events: none; /* Stops the iPad from trying to "drag" the image */
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
         /* --- Autumn Leaves Animation Styles --- */
         .leaf {
             position: fixed;
@@ -104,7 +115,7 @@
             More
         </div>
         <div class="card" onmousedown="speak('All done')" ontouchstart="speak('All done')">
-            <div class="emoji">👐</div>
+            <img src="images/all done.png" alt="All Done" class="card-img">
             All Done
         </div>
         <div class="card" onmousedown="speak('I need to use the bathroom')" ontouchstart="speak('I need to use the bathroom')">
@@ -118,11 +129,11 @@
             Banana
         </div>
         <div class="card" onmousedown="speak('Apple juice')" ontouchstart="speak('Apple juice')">
-            <div class="emoji">🧃</div>
+            <img src="images/juice.png" alt="Apple Juice" class="card-img">
             Apple Juice
         </div>
         <div class="card" onmousedown="speak('Milk')" ontouchstart="speak('Milk')">
-            <div class="emoji">🥛</div>
+            <img src="images/milk.png" alt="Milk" class="card-img">
             Milk
         </div>
 
@@ -131,12 +142,16 @@
             <div class="emoji">🚲</div>
             Bike Ride
         </div>
+        <div class="card" onmousedown="speak('I want to listen to music')" ontouchstart="speak('I want to listen to music')">
+            <img src="images/music.png" alt="Music" class="card-img">
+            Music
+        </div>
         <div class="card" onmousedown="speak('I want to watch TV')" ontouchstart="speak('I want to watch TV')">
             <div class="emoji">📺</div>
             TV
         </div>
         <div class="card" onmousedown="speak('I want to go to the park')" ontouchstart="speak('I want to go to the park')">
-            <div class="emoji">🛝</div>
+            <img src="images/park.png" alt="Park" class="card-img">
             Park
         </div>
         <div class="card" onmousedown="speak('I want to go on the swing')" ontouchstart="speak('I want to go on the swing')">
