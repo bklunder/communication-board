@@ -245,31 +245,52 @@
             }
         });
 
+        // --- Unlock iOS Audio ---
+        // Apple requires audio to be "primed" by a user interaction before it works freely.
+        let isAudioUnlocked = false;
+        function unlockAudio() {
+            if (!isAudioUnlocked) {
+                // Play a silent, empty phrase to unlock the speech engine permanently for this session
+                let silent = new SpeechSynthesisUtterance('');
+                silent.volume = 0; // Completely silent
+                window.speechSynthesis.speak(silent);
+                isAudioUnlocked = true;
+            }
+        }
+        // Prime the audio on the very first touch anywhere on the screen
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('mousedown', unlockAudio, { once: true });
+
         function speak(text) {
             // Prevent double-firing from touch and mouse events (Safari triggers both about 300ms apart)
-            // A 500ms delay prevents accidental double-taps and stutters while still feeling instant!
             if (Date.now() - lastSpeakTime < 500) return;
             lastSpeakTime = Date.now();
 
-            // Stop any currently speaking speech
-            window.speechSynthesis.cancel();
-            
-            let utterance = new SpeechSynthesisUtterance(text);
-            
-            // Look for a higher quality built-in voice
-            if (availableVoices.length > 0) {
-                // Try to find natural sounding Apple/iOS voices first, or fallback to any US English voice
-                let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
-                             || availableVoices.find(voice => voice.lang === 'en-US');
-                
-                if (bestVoice) {
-                    utterance.voice = bestVoice;
-                }
+            // iOS BUG FIX: Only cancel if it's CURRENTLY speaking. 
+            // If you cancel an idle speech engine on an iPad, it permanently breaks the very next speech request!
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
             }
             
-            utterance.rate = 0.9; // Slightly slower for clarity
-            
-            window.speechSynthesis.speak(utterance);
+            // iOS BUG FIX: Wrap the actual speech in a tiny 50-millisecond delay.
+            // This gives the iPad's audio engine a fraction of a second to "clear its throat" after a touch or cancel.
+            setTimeout(() => {
+                let utterance = new SpeechSynthesisUtterance(text);
+                
+                // Look for a higher quality built-in voice
+                if (availableVoices.length > 0) {
+                    let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
+                                 || availableVoices.find(voice => voice.lang === 'en-US');
+                    
+                    if (bestVoice) {
+                        utterance.voice = bestVoice;
+                    }
+                }
+                
+                utterance.rate = 0.9; // Slightly slower for clarity
+                
+                window.speechSynthesis.speak(utterance);
+            }, 50);
         }
 
         // --- Seasonal Theme & Animation Logic ---
