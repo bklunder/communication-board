@@ -156,8 +156,9 @@
         loadVoices(); // Try loading them immediately too
 
         function speak(text) {
-            // Prevent double-firing from touch and mouse events happening at the exact same time
-            if (Date.now() - lastSpeakTime < 100) return;
+            // Prevent double-firing from touch and mouse events (Safari triggers both about 300ms apart)
+            // A 500ms delay prevents accidental double-taps and stutters while still feeling instant!
+            if (Date.now() - lastSpeakTime < 500) return;
             lastSpeakTime = Date.now();
 
             // Stop any currently speaking speech
