@@ -13,8 +13,10 @@
             overflow-x: hidden; /* Stops the screen from moving sideways */
             margin: 0;
             padding: 20px;
-            /* Prevent text selection when tapping quickly */
+            /* Prevent text selection and magnifier when tapping quickly or long-pressing */
             user-select: none; 
+            -webkit-user-select: none; /* specifically for Apple devices */
+            -webkit-touch-callout: none; /* stops the long-press popup menu */
         }
         h1 {
             color: #333;
@@ -86,7 +88,8 @@
     </style>
 </head>
 <!-- Adding ontouchstart allows iPads to instantly recognize the 'squish' tap animation -->
-<body ontouchstart="">
+<!-- oncontextmenu="return false;" stops the long-press right-click menu entirely -->
+<body ontouchstart="" oncontextmenu="return false;">
 
     <h1>Nolan's Communication Board</h1>
 
