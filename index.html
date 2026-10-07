@@ -95,47 +95,47 @@
 
     <div class="board">
         <!-- Core Words -->
-        <div class="card" onpointerdown="speak('Help')">
+        <div class="card" onmousedown="speak('Help')" ontouchstart="speak('Help')">
             <div class="emoji">🤝</div>
             Help
         </div>
-        <div class="card" onpointerdown="speak('More')">
+        <div class="card" onmousedown="speak('More')" ontouchstart="speak('More')">
             <div class="emoji">➕</div>
             More
         </div>
-        <div class="card" onpointerdown="speak('All done')">
+        <div class="card" onmousedown="speak('All done')" ontouchstart="speak('All done')">
             <div class="emoji">👐</div>
             All Done
         </div>
-        <div class="card" onpointerdown="speak('I need to use the bathroom')">
+        <div class="card" onmousedown="speak('I need to use the bathroom')" ontouchstart="speak('I need to use the bathroom')">
             <div class="emoji">🚽</div>
             Bathroom
         </div>
 
         <!-- Food & Drink -->
-        <div class="card" onpointerdown="speak('Banana')">
+        <div class="card" onmousedown="speak('Banana')" ontouchstart="speak('Banana')">
             <div class="emoji">🍌</div>
             Banana
         </div>
-        <div class="card" onpointerdown="speak('Apple juice')">
+        <div class="card" onmousedown="speak('Apple juice')" ontouchstart="speak('Apple juice')">
             <div class="emoji">🧃</div>
             Apple Juice
         </div>
-        <div class="card" onpointerdown="speak('Milk')">
+        <div class="card" onmousedown="speak('Milk')" ontouchstart="speak('Milk')">
             <div class="emoji">🥛</div>
             Milk
         </div>
 
         <!-- Activities -->
-        <div class="card" onpointerdown="speak('I want to go for a bike ride')">
+        <div class="card" onmousedown="speak('I want to go for a bike ride')" ontouchstart="speak('I want to go for a bike ride')">
             <div class="emoji">🚲</div>
             Bike Ride
         </div>
-        <div class="card" onpointerdown="speak('I want to watch TV')">
+        <div class="card" onmousedown="speak('I want to watch TV')" ontouchstart="speak('I want to watch TV')">
             <div class="emoji">📺</div>
             TV
         </div>
-        <div class="card" onpointerdown="speak('I want to go on the swing')">
+        <div class="card" onmousedown="speak('I want to go on the swing')" ontouchstart="speak('I want to go on the swing')">
             <div class="emoji">🛝</div>
             Swing
         </div>
@@ -144,6 +144,7 @@
     <script>
         // Store the available voices
         let availableVoices = [];
+        let lastSpeakTime = 0;
 
         // This function loads the voices from the device
         function loadVoices() {
@@ -155,6 +156,10 @@
         loadVoices(); // Try loading them immediately too
 
         function speak(text) {
+            // Prevent double-firing from touch and mouse events happening at the exact same time
+            if (Date.now() - lastSpeakTime < 100) return;
+            lastSpeakTime = Date.now();
+
             // Stop any currently speaking speech
             window.speechSynthesis.cancel();
             
