@@ -10,13 +10,18 @@
             text-align: center;
             /* Background is now set dynamically by JavaScript based on the season */
             min-height: 100vh; /* Ensures the background covers the whole screen */
-            overflow-x: hidden; /* Stops the screen from moving sideways */
+            overflow: hidden; /* completely stops scrolling and overscroll bouncing */
             margin: 0;
             padding: 20px;
             /* Prevent text selection and magnifier when tapping quickly or long-pressing */
             user-select: none; 
             -webkit-user-select: none; /* specifically for Apple devices */
             -webkit-touch-callout: none; /* stops the long-press popup menu */
+            
+            /* Stop standard swipe-to-navigate gestures */
+            overscroll-behavior-x: none;
+            overscroll-behavior-y: none;
+            touch-action: none; 
         }
         h1 {
             color: #333;
