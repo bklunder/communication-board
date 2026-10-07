@@ -8,8 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            /* Beautiful Autumn Gradient Background */
-            background: linear-gradient(to bottom, #ffebd2, #ffb38a); 
+            /* Background is now set dynamically by JavaScript based on the season */
             min-height: 100vh; /* Ensures the background covers the whole screen */
             overflow-x: hidden; /* Stops the screen from moving sideways */
             margin: 0;
@@ -168,31 +167,53 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- Autumn Leaves Animation Logic ---
-        function createLeaves() {
-            const leaves = ['🍂', '🍁', '🍃'];
+        // --- Seasonal Theme & Animation Logic ---
+        function setSeasonalTheme() {
+            // Get the current month (0 = January, 11 = December)
+            const month = new Date().getMonth(); 
+            let emojis = [];
+            let background = '';
+
+            // Ottawa (Northern Hemisphere) Seasons
+            if (month === 11 || month === 0 || month === 1) { 
+                // Winter: Dec, Jan, Feb
+                emojis = ['❄️', '🌨️', '⛄'];
+                background = 'linear-gradient(to bottom, #e0f7fa, #b2ebf2)'; // Icy blue
+            } else if (month >= 2 && month <= 4) { 
+                // Spring: Mar, Apr, May
+                emojis = ['🌸', '🌷', '🌱'];
+                background = 'linear-gradient(to bottom, #fce4ec, #f8bbd0)'; // Soft pink
+            } else if (month >= 5 && month <= 7) { 
+                // Summer: Jun, Jul, Aug
+                emojis = ['☀️', '🌻', '🦋'];
+                background = 'linear-gradient(to bottom, #e1f5fe, #fff9c4)'; // Blue sky & warm yellow
+            } else { 
+                // Autumn: Sep, Oct, Nov
+                emojis = ['🍂', '🍁', '🍃'];
+                background = 'linear-gradient(to bottom, #ffebd2, #ffb38a)'; // Warm orange
+            }
+
+            // Apply the background color
+            document.body.style.background = background;
+
+            // Generate the falling animation
             const container = document.body;
-            
-            // Create 25 leaves
             for (let i = 0; i < 25; i++) {
-                let leaf = document.createElement('div');
-                leaf.className = 'leaf';
+                let item = document.createElement('div');
+                item.className = 'leaf'; // Reusing the same animation CSS class
                 
-                // Pick a random leaf emoji
-                leaf.innerText = leaves[Math.floor(Math.random() * leaves.length)];
+                item.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                item.style.left = Math.random() * 100 + 'vw';
+                item.style.animationDuration = Math.random() * 5 + 6 + 's'; 
+                item.style.animationDelay = Math.random() * 5 + 's'; 
+                item.style.fontSize = Math.random() * 15 + 20 + 'px'; 
                 
-                // Randomize position, speed, and size
-                leaf.style.left = Math.random() * 100 + 'vw';
-                leaf.style.animationDuration = Math.random() * 5 + 6 + 's'; // Falling speed (6 to 11 seconds)
-                leaf.style.animationDelay = Math.random() * 5 + 's'; // Stagger the start times
-                leaf.style.fontSize = Math.random() * 15 + 20 + 'px'; // Random size
-                
-                container.appendChild(leaf);
+                container.appendChild(item);
             }
         }
         
-        // Start the leaves falling when the page loads
-        window.addEventListener('load', createLeaves);
+        // Run the theme checker when the page loads
+        window.addEventListener('load', setSeasonalTheme);
     </script>
 
 </body>
