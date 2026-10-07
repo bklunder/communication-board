@@ -96,11 +96,50 @@
                 opacity: 0;
             }
         }
+        /* --- Fun Background Animations --- */
+        .fun-plane {
+            position: fixed;
+            top: 8%;
+            left: -150px;
+            font-size: 45px;
+            z-index: -2; /* Stays far behind everything */
+            pointer-events: none; /* Stops it from blocking taps */
+            user-select: none;
+            animation: flyPlane 35s linear infinite;
+        }
+
+        .fun-train {
+            position: fixed;
+            bottom: 2%;
+            right: -300px;
+            font-size: 55px;
+            z-index: -2;
+            pointer-events: none;
+            user-select: none;
+            animation: driveTrain 45s linear infinite;
+            animation-delay: 15s; /* Delays the train so they don't always appear at the same time */
+        }
+
+        @keyframes flyPlane {
+            0% { left: -150px; transform: translateY(0); }
+            15% { left: 110vw; transform: translateY(-30px); } /* Slight upward tilt as it flies */
+            100% { left: 110vw; } 
+        }
+
+        @keyframes driveTrain {
+            0% { right: -300px; }
+            20% { right: 110vw; } 
+            100% { right: 110vw; }
+        }
     </style>
 </head>
 <!-- Adding ontouchstart allows iPads to instantly recognize the 'squish' tap animation -->
 <!-- oncontextmenu="return false;" stops the long-press right-click menu entirely -->
 <body ontouchstart="" oncontextmenu="return false;">
+
+    <!-- Fun Background Animations -->
+    <div class="fun-plane">✈️</div>
+    <div class="fun-train">🚂🚋🚋</div>
 
     <h1>Nolan's Communication Board</h1>
 
