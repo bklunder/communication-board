@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Communication Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff; 
+            margin: 0;
+            padding: 20px;
+            /* Prevent text selection when tapping quickly */
+            user-select: none; 
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        /* We use a 'Grid' to automatically arrange the cards nicely */
+        .board {
+            display: grid;
+            /* This makes columns that adapt to the screen size automatically */
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1; /* Keeps the cards perfectly square */
+            border: 4px solid transparent;
+        }
+
+        /* Makes the card 'squish' a little when pressed so he knows it worked */
+        .card:active {
+            transform: scale(0.95);
+            border-color: #4CAF50; /* Green border when tapped */
+        }
+
+        .emoji {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>My Communication Board</h1>
+
+    <div class="board">
+        <!-- Core Words -->
+        <div class="card" onclick="speak('I need help')">
+            <div class="emoji">🤝</div>
+            Help
+        </div>
+        <div class="card" onclick="speak('More please')">
+            <div class="emoji">➕</div>
+            More
+        </div>
+        <div class="card" onclick="speak('All done')">
+            <div class="emoji">👐</div>
+            All Done
+        </div>
+        <div class="card" onclick="speak('I need to use the bathroom')">
+            <div class="emoji">🚽</div>
+            Bathroom
+        </div>
+
+        <!-- Food & Drink -->
+        <div class="card" onclick="speak('Banana')">
+            <div class="emoji">🍌</div>
+            Banana
+        </div>
+        <div class="card" onclick="speak('Apple juice')">
+            <div class="emoji">🧃</div>
+            Apple Juice
+        </div>
+        <div class="card" onclick="speak('Milk')">
+            <div class="emoji">🥛</div>
+            Milk
+        </div>
+
+        <!-- Activities -->
+        <div class="card" onclick="speak('I want to go for a bike ride')">
+            <div class="emoji">🚲</div>
+            Bike Ride
+        </div>
+        <div class="card" onclick="speak('I want to watch TV')">
+            <div class="emoji">📺</div>
+            TV
+        </div>
+        <div class="card" onclick="speak('I want to go on the swing')">
+            <div class="emoji">🛝</div>
+            Swing
+        </div>
+    </div>
+
+    <script>
+        // Store the available voices
+        let availableVoices = [];
+
+        // This function loads the voices from the device
+        function loadVoices() {
+            availableVoices = window.speechSynthesis.getVoices();
+        }
+
+        // Browsers sometimes take a second to load voices, so we tell it to listen for them
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices(); // Try loading them immediately too
+
+        function speak(text) {
+            // Stop any currently speaking speech
+            window.speechSynthesis.cancel();
+            
+            let utterance = new SpeechSynthesisUtterance(text);
+            
+            // Look for a higher quality built-in voice
+            if (availableVoices.length > 0) {
+                // Try to find natural sounding Apple/iOS voices first, or fallback to any US English voice
+                let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
+                             || availableVoices.find(voice => voice.lang === 'en-US');
+                
+                if (bestVoice) {
+                    utterance.voice = bestVoice;
+                }
+            }
+            
+            utterance.rate = 0.9; // Slightly slower for clarity
+            
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+
+</body>
+</html>
