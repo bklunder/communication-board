@@ -133,7 +133,7 @@
             }
         }
         /* --- Fun Background Animations --- */
-        .fun-plane {
+        .fun-plane, .fun-plane2 {
             position: fixed;
             width: 16.66vw; /* 1/6th of the screen width */
             object-fit: contain; /* Prevents the image from stretching */
@@ -170,6 +170,7 @@
 
     <!-- Fun Background Animations -->
     <img src="images/plane.png" class="fun-plane" alt="Flying Plane">
+    <img src="images/plane2.png" class="fun-plane2" alt="Flying Plane 2">
     <div class="fun-train">🚂🚋🚋</div>
 
     <h1>Nolan's Communication Board</h1>
@@ -489,7 +490,12 @@
 
         // --- Random Flying Plane Logic ---
         function launchPlane() {
-            const plane = document.querySelector('.fun-plane');
+            const plane1 = document.querySelector('.fun-plane');
+            const plane2 = document.querySelector('.fun-plane2');
+            
+            // Randomly choose which plane to fly this time (50/50 chance)
+            const isPlane1 = Math.random() > 0.5;
+            const activePlane = isPlane1 ? plane1 : plane2;
             
             // Randomize starting and ending heights (between 5% and 40% from the top)
             const startY = Math.random() * 35 + 5; 
@@ -498,21 +504,36 @@
             // Randomize the flight speed (between 8 and 15 seconds to cross the screen)
             const flightTime = Math.random() * 7 + 8;
 
-            // Reset the plane to the left side, hidden
-            plane.style.transition = 'none';
-            plane.style.opacity = '1';
-            plane.style.left = '-20vw';
-            plane.style.top = startY + 'vh';
+            // Reset the chosen plane to its starting position, hidden
+            activePlane.style.transition = 'none';
+            activePlane.style.opacity = '1';
+            
+            if (isPlane1) {
+                activePlane.style.left = '-20vw'; // Plane 1 starts on the left
+                // Ensure it faces right
+                activePlane.style.transform = 'scaleX(1)';
+            } else {
+                activePlane.style.left = '110vw'; // Plane 2 starts on the right
+                // Optional: if plane2 naturally points right, we can flip it left by uncommenting the next line
+                // activePlane.style.transform = 'scaleX(-1)'; 
+            }
+            activePlane.style.top = startY + 'vh';
 
             // Wait a tiny bit for the CSS to reset, then trigger the animation
             setTimeout(() => {
-                plane.style.transition = `left ${flightTime}s linear, top ${flightTime}s linear`;
-                plane.style.left = '110vw'; // Fly all the way across
-                plane.style.top = endY + 'vh'; // Arrive at the new height
+                activePlane.style.transition = `left ${flightTime}s linear, top ${flightTime}s linear`;
+                
+                if (isPlane1) {
+                    activePlane.style.left = '110vw'; // Fly all the way across to the right
+                } else {
+                    activePlane.style.left = '-20vw'; // Fly all the way across to the left
+                }
+                
+                activePlane.style.top = endY + 'vh'; // Arrive at the new height
                 
                 // Hide it when it finishes
                 setTimeout(() => {
-                    plane.style.opacity = '0';
+                    activePlane.style.opacity = '0';
                 }, flightTime * 1000);
             }, 50);
 
