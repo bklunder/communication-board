@@ -10,18 +10,12 @@
             text-align: center;
             /* Background is now set dynamically by JavaScript based on the season */
             min-height: 100vh; /* Ensures the background covers the whole screen */
-            overflow: hidden; /* completely stops scrolling and overscroll bouncing */
             margin: 0;
             padding: 20px;
             /* Prevent text selection and magnifier when tapping quickly or long-pressing */
             user-select: none; 
             -webkit-user-select: none; /* specifically for Apple devices */
             -webkit-touch-callout: none; /* stops the long-press popup menu */
-            
-            /* Stop standard swipe-to-navigate gestures */
-            overscroll-behavior-x: none;
-            overscroll-behavior-y: none;
-            touch-action: none; 
         }
         h1 {
             color: #333;
@@ -206,6 +200,12 @@
             <img src="images/swing.jpg" alt="Swing" class="card-img">
             Swing
         </div>
+        
+        <!-- Navigation Placeholder -->
+        <div class="card" id="nextPageBtn" onmousedown="speak('Next page'); changePage()" ontouchstart="speak('Next page'); changePage()">
+            <div class="emoji">✨</div>
+            Next Page
+        </div>
     </div>
 
     <script>
@@ -346,6 +346,45 @@
         
         // Run the theme checker when the page loads
         window.addEventListener('load', setSeasonalTheme);
+
+        // --- Magic Next Page Logic ---
+        let lastPageChangeTime = 0;
+        function changePage() {
+            // Prevent double-firing from Safari's touch+mouse events
+            if (Date.now() - lastPageChangeTime < 500) return;
+            lastPageChangeTime = Date.now();
+
+            // 1. Change the theme colors and falling particles randomly
+            const themes = [
+                { bg: 'linear-gradient(to bottom, #e0f7fa, #b2ebf2)', emojis: ['❄️', '🌨️', '⛄'] }, // Winter
+                { bg: 'linear-gradient(to bottom, #fce4ec, #f8bbd0)', emojis: ['🌸', '🌷', '🌱'] }, // Spring
+                { bg: 'linear-gradient(to bottom, #e1f5fe, #fff9c4)', emojis: ['☀️', '🌻', '🦋'] }, // Summer
+                { bg: 'linear-gradient(to bottom, #ffebd2, #ffb38a)', emojis: ['🍂', '🍁', '🍃'] }, // Autumn
+                { bg: 'linear-gradient(to bottom, #e8eaf6, #c5cae9)', emojis: ['⭐', '🌙', '✨'] }, // Night Space
+                { bg: 'linear-gradient(to bottom, #e8f5e9, #a5d6a7)', emojis: ['🐸', '🐢', '🦕'] }  // Dino/Frog
+            ];
+            const newTheme = themes[Math.floor(Math.random() * themes.length)];
+            
+            document.body.style.background = newTheme.bg;
+            
+            const leaves = document.querySelectorAll('.leaf');
+            leaves.forEach(leaf => {
+                leaf.innerText = newTheme.emojis[Math.floor(Math.random() * newTheme.emojis.length)];
+            });
+
+            // 2. Shuffle the cards to make a "new page" feel
+            const board = document.querySelector('.board');
+            const cards = Array.from(board.querySelectorAll('.card:not(#nextPageBtn)'));
+            
+            // Fisher-Yates shuffle algorithm
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                board.insertBefore(cards[j], cards[i]);
+            }
+            
+            // Make sure the "Next Page" button stays at the very end
+            board.appendChild(document.getElementById('nextPageBtn'));
+        }
 
         // --- Random Flying Plane Logic ---
         function launchPlane() {
