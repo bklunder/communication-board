@@ -254,50 +254,49 @@
             }
         });
 
-        // --- Unlock iOS Audio & Prevent Sleep Bug ---
-        // Apple requires audio to be "primed" by a user interaction before it works freely.
-        // Furthermore, Safari's speech engine goes to sleep if not used for a few minutes.
+        // --- iOS 15 Audio Fixes ---
         let isAudioUnlocked = false;
-        function unlockAudio() {
-            if (!isAudioUnlocked) {
-                let silent = new SpeechSynthesisUtterance('');
-                silent.volume = 0; // Completely silent
-                window.speechSynthesis.speak(silent);
-                isAudioUnlocked = true;
-
-                // Keep the audio engine awake by sending a silent pulse every 15 seconds!
-                setInterval(() => {
-                    let keepAlive = new SpeechSynthesisUtterance('');
-                    keepAlive.volume = 0;
-                    window.speechSynthesis.speak(keepAlive);
-                }, 15000);
-            }
-        }
-        // Prime the audio on the very first touch anywhere on the screen
-        document.addEventListener('touchstart', unlockAudio, { once: true });
-        document.addEventListener('mousedown', unlockAudio, { once: true });
 
         function speak(text) {
             // Prevent double-firing from touch and mouse events (Safari triggers both about 300ms apart)
             if (Date.now() - lastSpeakTime < 500) return;
             lastSpeakTime = Date.now();
             
-            // We removed the cancel() and delay here, as they often cause the Apple speech engine to crash on the first tap.
-            let utterance = new SpeechSynthesisUtterance(text);
-            
-            // Look for a higher quality built-in voice
-            if (availableVoices.length > 0) {
-                let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
-                             || availableVoices.find(voice => voice.lang === 'en-US');
-                
-                if (bestVoice) {
-                    utterance.voice = bestVoice;
-                }
+            // First time a button is pressed, start the "keep alive" interval
+            if (!isAudioUnlocked) {
+                isAudioUnlocked = true;
+                // Every 10 seconds, briefly pause and resume to prevent iOS from sleeping the audio engine
+                setInterval(() => {
+                    window.speechSynthesis.pause();
+                    window.speechSynthesis.resume();
+                }, 10000);
             }
+
+            // ALWAYS cancel any stuck speech before starting a new one
+            window.speechSynthesis.cancel();
             
-            utterance.rate = 0.9; // Slightly slower for clarity
-            
-            window.speechSynthesis.speak(utterance);
+            // Wrap the actual speech in a 50-millisecond delay.
+            // On iOS 15, if you cancel and speak in the exact same millisecond, the engine crashes and goes silent!
+            setTimeout(() => {
+                let utterance = new SpeechSynthesisUtterance(text);
+                
+                // Look for a higher quality built-in voice
+                if (availableVoices.length > 0) {
+                    let bestVoice = availableVoices.find(voice => voice.name.includes('Siri') || voice.name === 'Alex' || voice.name === 'Samantha') 
+                                 || availableVoices.find(voice => voice.lang === 'en-US');
+                    
+                    if (bestVoice) {
+                        utterance.voice = bestVoice;
+                    }
+                }
+                
+                utterance.rate = 0.9; // Slightly slower for clarity
+                
+                window.speechSynthesis.speak(utterance);
+                
+                // CRITICAL FOR IOS 15: Force the engine to resume immediately after queueing the speech
+                window.speechSynthesis.resume();
+            }, 50);
         }
 
         // --- Seasonal Theme & Animation Logic ---
