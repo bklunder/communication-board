@@ -202,7 +202,7 @@
         </div>
         
         <!-- Navigation Placeholder -->
-        <div class="card" id="nextPageBtn" onmousedown="speak('Next page'); changePage()" ontouchstart="speak('Next page'); changePage()">
+        <div class="card" id="nextPageBtn" onmousedown="playMagicSound(); changePage()" ontouchstart="playMagicSound(); changePage()">
             <div class="emoji">✨</div>
             Next Page
         </div>
@@ -212,6 +212,45 @@
         // Store the available voices
         let availableVoices = [];
         let lastSpeakTime = 0;
+
+        // --- Web Audio API (For Sound Effects) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playMagicSound() {
+            // Stop any currently speaking speech so the sound effect is clear
+            window.speechSynthesis.cancel();
+            
+            // Wake up the audio context if iOS put it to sleep
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const now = audioCtx.currentTime;
+            
+            // Play a quick, pleasing 3-note chime (C5, E5, G5)
+            playTone(523.25, now, 0.1); 
+            playTone(659.25, now + 0.1, 0.15); 
+            playTone(783.99, now + 0.2, 0.3); 
+        }
+
+        function playTone(frequency, startTime, duration) {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine'; // Smooth, bell-like tone
+            osc.frequency.setValueAtTime(frequency, startTime);
+            
+            // Fade the volume in and out smoothly so it doesn't click
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
 
         // This function loads the voices from the device
         function loadVoices() {
@@ -256,6 +295,13 @@
 
         // --- iOS 15 Audio Fixes ---
         let isAudioUnlocked = false;
+
+        // Make sure we unlock the AudioContext on first touch too!
+        document.addEventListener('touchstart', () => {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
 
         function speak(text) {
             // Prevent double-firing from touch and mouse events (Safari triggers both about 300ms apart)
