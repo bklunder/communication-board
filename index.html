@@ -285,15 +285,25 @@
         let lastSpeakTime = 0;
 
         // --- Web Audio API (For Sound Effects) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playMagicSound() {
-            // Stop any currently speaking speech so the sound effect is clear
-            window.speechSynthesis.cancel();
-            
+        // Initialize this inside a function or on first touch so iOS doesn't block it!
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+        }
+
+        // Initialize AudioContext on the very first touch
+        document.addEventListener('touchstart', initAudio, { once: true });
+        document.addEventListener('mousedown', initAudio, { once: true });
+
+        function playMagicSound() {
+            window.speechSynthesis.cancel();
+            
+            initAudio(); // Ensure it's ready
 
             const now = audioCtx.currentTime;
             
@@ -304,9 +314,7 @@
         }
 
         function playResetSound() {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            initAudio(); // Ensure it's ready
 
             const now = audioCtx.currentTime;
             
@@ -378,13 +386,6 @@
 
         // --- iOS 15 Audio Fixes ---
         let isAudioUnlocked = false;
-
-        // Make sure we unlock the AudioContext on first touch too!
-        document.addEventListener('touchstart', () => {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }, { once: true });
 
         function speak(text) {
             // Prevent double-firing from touch and mouse events (Safari triggers both about 300ms apart)
