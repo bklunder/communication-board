@@ -512,13 +512,41 @@
         // Request it when the app loads, and re-request it when they tap the screen 
         // (Browsers often require a user interaction first to allow keeping the screen on)
         window.addEventListener('load', requestWakeLock);
-        document.addEventListener('touchstart', requestWakeLock, { once: true });
-        document.addEventListener('mousedown', requestWakeLock, { once: true });
+        
+        function unlockAudioAndSpeech() {
+            initAudio();
+            if (window.speechSynthesis) {
+                window.speechSynthesis.resume();
+                // Prime the speech engine with an empty utterance on first interaction
+                if (!isAudioUnlocked) {
+                    isAudioUnlocked = true;
+                    let primingUtterance = new SpeechSynthesisUtterance('');
+                    window.speechSynthesis.speak(primingUtterance);
+                }
+            }
+        }
 
-        // Also re-request when the app comes back from being minimized
+        document.addEventListener('touchstart', () => {
+            requestWakeLock();
+            unlockAudioAndSpeech();
+        }, { once: true });
+
+        document.addEventListener('mousedown', () => {
+            requestWakeLock();
+            unlockAudioAndSpeech();
+        }, { once: true });
+
+        // Also re-request when the app comes back from being minimized or idle
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 requestWakeLock();
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.resume();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
             }
         });
 
