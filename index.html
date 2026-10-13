@@ -546,7 +546,13 @@
             // Wrap the actual speech in a 50-millisecond delay.
             // On iOS 15, if you cancel and speak in the exact same millisecond, the engine crashes and goes silent!
             setTimeout(() => {
-                let utterance = new SpeechSynthesisUtterance(text);
+                // Prevent speech engines from reading single-letter 'I' as 'Capital I'
+                let speechText = text;
+                if (speechText === 'I') {
+                    speechText = 'I.';
+                }
+
+                let utterance = new SpeechSynthesisUtterance(speechText);
                 
                 // Look for a higher quality built-in voice
                 if (availableVoices.length > 0) {
