@@ -387,6 +387,7 @@
         let availableVoices = [];
         let lastSpeakTime = 0;
         let currentSentence = [];
+        let sentenceClearTimeout = null;
 
         function handleCardPress(text) {
             // Prevent double-firing
@@ -395,9 +396,19 @@
             // Speak individual word immediately
             speak(text);
 
+            // Clear any existing inactivity timer
+            if (sentenceClearTimeout) {
+                clearTimeout(sentenceClearTimeout);
+            }
+
             // Add to sentence builder
             currentSentence.push(text);
             updateSentenceDisplay();
+
+            // Auto-clear sentence after 5 seconds of inactivity
+            sentenceClearTimeout = setTimeout(() => {
+                clearSentence();
+            }, 5000);
         }
 
         function updateSentenceDisplay() {
@@ -413,11 +424,18 @@
             if (currentSentence.length === 0) return;
             const fullSentence = currentSentence.join(' ');
             speak(fullSentence);
+
+            // Auto-clear 2 seconds after speaking the full sentence
+            if (sentenceClearTimeout) clearTimeout(sentenceClearTimeout);
+            sentenceClearTimeout = setTimeout(() => {
+                clearSentence();
+            }, 2000);
         }
 
         function clearSentence() {
             // Prevent double-firing
             if (Date.now() - lastSpeakTime < 500) return;
+            if (sentenceClearTimeout) clearTimeout(sentenceClearTimeout);
             currentSentence = [];
             updateSentenceDisplay();
         }
