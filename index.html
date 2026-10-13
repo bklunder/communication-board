@@ -301,7 +301,7 @@
             <img src="images/want.png" alt="Want" class="card-img">
             Want
         </div>
-        <div class="card bg-core" onmousedown="handleCardPress('Eat')" ontouchstart="handleCardPress('Eat')">
+        <div class="card bg-core" onmousedown="handleCardPress('Eat', 'to eat')" ontouchstart="handleCardPress('Eat', 'to eat')">
             <img src="images/eat.png" alt="Eat" class="card-img">
             Eat
         </div>
@@ -389,20 +389,22 @@
         let currentSentence = [];
         let sentenceClearTimeout = null;
 
-        function handleCardPress(text) {
+        function handleCardPress(displayLabel, spokenText) {
             // Prevent double-firing
             if (Date.now() - lastSpeakTime < 500) return;
             
+            const textToSpeak = spokenText || displayLabel;
+
             // Speak individual word immediately
-            speak(text);
+            speak(textToSpeak);
 
             // Clear any existing inactivity timer
             if (sentenceClearTimeout) {
                 clearTimeout(sentenceClearTimeout);
             }
 
-            // Add to sentence builder
-            currentSentence.push(text);
+            // Add to sentence builder (use spokenText if available for grammar sentence flow, or displayLabel)
+            currentSentence.push(textToSpeak);
             updateSentenceDisplay();
 
             // Auto-clear sentence after 5 seconds of inactivity
