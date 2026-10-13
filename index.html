@@ -19,7 +19,79 @@
         }
         h1 {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* --- Dynamic Sentence Builder Bar --- */
+        .sentence-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            border-radius: 20px;
+            padding: 12px 20px;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 4px solid #bbdefb;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+
+        .sentence-display {
+            flex-grow: 1;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0 5px;
+            cursor: pointer;
+        }
+
+        .placeholder-text {
+            color: #999;
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        .sentence-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .sentence-btn {
+            background-color: #e3f2fd;
+            border: 2px solid #2196f3;
+            color: #0d47a1;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.1s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .sentence-btn:active {
+            transform: scale(0.90);
+            background-color: #bbdefb;
+        }
+
+        .clear-btn {
+            background-color: #ffebee;
+            border-color: #ef5350;
+            color: #c62828;
+        }
+
+        .clear-btn:active {
+            background-color: #ffcdd2;
         }
         
         /* We use a 'Grid' to automatically arrange the cards nicely */
@@ -200,73 +272,104 @@
 
     <h1>Nolan's Communication Board</h1>
 
+    <!-- Dynamic Sentence Builder Bar -->
+    <div class="sentence-bar">
+        <div id="sentence-display" class="sentence-display" onclick="speakSentence()" ontouchstart="speakSentence()">
+            <span class="placeholder-text">Tap words to build a sentence...</span>
+        </div>
+        <div class="sentence-actions">
+            <button class="sentence-btn" onclick="speakSentence()" ontouchstart="speakSentence()">🔊 Speak</button>
+            <button class="sentence-btn clear-btn" onclick="clearSentence()" ontouchstart="clearSentence()">🗑️ Clear</button>
+        </div>
+    </div>
+
     <div class="board">
         <!-- Core Words -->
-        <div class="card bg-core" onmousedown="speak('Yes')" ontouchstart="speak('Yes')">
+        <div class="card bg-core" onmousedown="handleCardPress('I')" ontouchstart="handleCardPress('I')">
+            <img src="images/I.png" alt="I" class="card-img">
+            I
+        </div>
+        <div class="card bg-core" onmousedown="handleCardPress('Want')" ontouchstart="handleCardPress('Want')">
+            <img src="images/want.png" alt="Want" class="card-img">
+            Want
+        </div>
+        <div class="card bg-core" onmousedown="handleCardPress('Eat')" ontouchstart="handleCardPress('Eat')">
+            <img src="images/eat.png" alt="Eat" class="card-img">
+            Eat
+        </div>
+        <div class="card bg-core" onmousedown="handleCardPress('Yes')" ontouchstart="handleCardPress('Yes')">
             <div class="emoji">✅</div>
             Yes
         </div>
-        <div class="card bg-core" onmousedown="speak('No')" ontouchstart="speak('No')">
+        <div class="card bg-core" onmousedown="handleCardPress('No')" ontouchstart="handleCardPress('No')">
             <div class="emoji">❌</div>
             No
         </div>
-        <div class="card bg-core" onmousedown="speak('Help please')" ontouchstart="speak('Help please')">
-            <div class="emoji">🤝</div>
+        <div class="card bg-core" onmousedown="handleCardPress('Help')" ontouchstart="handleCardPress('Help')">
+            <img src="images/help.png" alt="Help" class="card-img">
             Help
         </div>
-        <div class="card bg-core" onmousedown="speak('More')" ontouchstart="speak('More')">
-            <div class="emoji">➕</div>
+        <div class="card bg-core" onmousedown="handleCardPress('More')" ontouchstart="handleCardPress('More')">
+            <img src="images/more.png" alt="More" class="card-img">
             More
         </div>
-        <div class="card bg-core" onmousedown="speak('All done')" ontouchstart="speak('All done')">
+        <div class="card bg-core" onmousedown="handleCardPress('All done')" ontouchstart="handleCardPress('All done')">
             <img src="images/all done.png" alt="All Done" class="card-img">
             All Done
         </div>
-        <div class="card bg-core" onmousedown="speak('I need to use the bathroom')" ontouchstart="speak('I need to use the bathroom')">
+        <div class="card bg-core" onmousedown="handleCardPress('Bathroom')" ontouchstart="handleCardPress('Bathroom')">
             <div class="emoji">🚽</div>
             Bathroom
         </div>
 
         <!-- Food & Drink -->
-        <div class="card bg-food" onmousedown="speak('Banana')" ontouchstart="speak('Banana')">
+        <div class="card bg-food" onmousedown="handleCardPress('Banana')" ontouchstart="handleCardPress('Banana')">
             <div class="emoji">🍌</div>
             Banana
         </div>
-        <div class="card bg-food" onmousedown="speak('Apple juice')" ontouchstart="speak('Apple juice')">
+        <div class="card bg-food" onmousedown="handleCardPress('Apple juice')" ontouchstart="handleCardPress('Apple juice')">
             <img src="images/juice.png" alt="Apple Juice" class="card-img">
             Apple Juice
         </div>
-        <div class="card bg-food" onmousedown="speak('Milk')" ontouchstart="speak('Milk')">
+        <div class="card bg-food" onmousedown="handleCardPress('Milk')" ontouchstart="handleCardPress('Milk')">
             <img src="images/milk.png" alt="Milk" class="card-img">
             Milk
         </div>
+        <div class="card bg-food" onmousedown="handleCardPress('Bear Paws')" ontouchstart="handleCardPress('Bear Paws')">
+            <img src="images/bearpaw.jpg" alt="Bear Paws" class="card-img">
+            Bear Paws
+        </div>
+        <div class="card bg-food" onmousedown="handleCardPress('Chewy')" ontouchstart="handleCardPress('Chewy')">
+            <img src="images/chewy.png" alt="Chewy" class="card-img">
+            Chewy
+        </div>
 
         <!-- Activities -->
-        <div class="card bg-activity" onmousedown="speak('I want to go for a bike ride')" ontouchstart="speak('I want to go for a bike ride')">
+        <div class="card bg-activity" onmousedown="handleCardPress('I want to go for a bike ride')" ontouchstart="handleCardPress('I want to go for a bike ride')">
             <div class="emoji">🚲</div>
             Bike Ride
         </div>
-        <div class="card bg-activity" onmousedown="speak('I want to listen to music')" ontouchstart="speak('I want to listen to music')">
+        <div class="card bg-activity" onmousedown="handleCardPress('I want to listen to music')" ontouchstart="handleCardPress('I want to listen to music')">
             <img src="images/music.png" alt="Music" class="card-img">
             Music
         </div>
-        <div class="card bg-activity" onmousedown="speak('I want to watch TV')" ontouchstart="speak('I want to watch TV')">
+        <div class="card bg-activity" onmousedown="handleCardPress('I want to watch TV')" ontouchstart="handleCardPress('I want to watch TV')">
             <div class="emoji">📺</div>
             TV
         </div>
-        <div class="card bg-activity" onmousedown="speak('I want to go to the park')" ontouchstart="speak('I want to go to the park')">
+        <div class="card bg-activity" onmousedown="handleCardPress('I want to go to the park')" ontouchstart="handleCardPress('I want to go to the park')">
             <img src="images/park.png" alt="Park" class="card-img">
             Park
         </div>
-        <div class="card bg-activity" onmousedown="speak('I want to go on the swing')" ontouchstart="speak('I want to go on the swing')">
+        <div class="card bg-activity" onmousedown="handleCardPress('I want to go on the swing')" ontouchstart="handleCardPress('I want to go on the swing')">
             <img src="images/swing.jpg" alt="Swing" class="card-img">
             Swing
         </div>
-        <div class="card bg-activity" onmousedown="speak('Ms. Rachel')" ontouchstart="speak('Ms. Rachel')">
+        <div class="card bg-activity" onmousedown="handleCardPress('Ms. Rachel')" ontouchstart="handleCardPress('Ms. Rachel')">
             <img src="images/ms rachel.jpg" alt="Ms Rachel" class="card-img">
             Ms. Rachel
         </div>
-        <div class="card bg-activity" onmousedown="speak('TV Songs')" ontouchstart="speak('TV Songs')">
+        <div class="card bg-activity" onmousedown="handleCardPress('TV Songs')" ontouchstart="handleCardPress('TV Songs')">
             <img src="images/super simple.jpg" alt="Super Simple" class="card-img">
             TV Songs
         </div>
@@ -283,6 +386,41 @@
         // Store the available voices
         let availableVoices = [];
         let lastSpeakTime = 0;
+        let currentSentence = [];
+
+        function handleCardPress(text) {
+            // Prevent double-firing
+            if (Date.now() - lastSpeakTime < 500) return;
+            
+            // Speak individual word immediately
+            speak(text);
+
+            // Add to sentence builder
+            currentSentence.push(text);
+            updateSentenceDisplay();
+        }
+
+        function updateSentenceDisplay() {
+            const display = document.getElementById('sentence-display');
+            if (currentSentence.length === 0) {
+                display.innerHTML = '<span class="placeholder-text">Tap words to build a sentence...</span>';
+            } else {
+                display.innerText = currentSentence.join('   ›   ');
+            }
+        }
+
+        function speakSentence() {
+            if (currentSentence.length === 0) return;
+            const fullSentence = currentSentence.join(' ');
+            speak(fullSentence);
+        }
+
+        function clearSentence() {
+            // Prevent double-firing
+            if (Date.now() - lastSpeakTime < 500) return;
+            currentSentence = [];
+            updateSentenceDisplay();
+        }
 
         // --- Web Audio API (For Sound Effects) ---
         // Initialize this inside a function or on first touch so iOS doesn't block it!
@@ -595,6 +733,17 @@
         window.addEventListener('load', () => {
             setTimeout(launchPlane, 5000); // First flight happens 5 seconds after app opens!
         });
+
+        // --- Prevent iOS Pinch-Zooming ---
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchmove', function (e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
 
     </script>
 
